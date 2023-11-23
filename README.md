@@ -1,5 +1,6 @@
 # Nina Flashing instructions (guidelines here: bitcraze website)
 
+```
 #Pull docker
 $ docker pull bitcraze/aideck-nina
 
@@ -20,16 +21,26 @@ $ cd NINA/firmware/
 # Verify port of your olimex device : (should look like /dev/ttyUSB0 or another number, make sure to change the --device if your programmer is on another port)
 $ dmesg
 
+
+# Run now the docker command
+
+# this specifies docker version/tag. This does make clean all flash
+$ docker run --rm -it -v $PWD:/module/ --device /dev/ttyUSB0 --privileged -P bitcraze/aideck-nina:3.3.1 /bin/bash -c "make clean; make menuconfig; make all; /openocd-esp32/bin/openocd -f interface/ftdi/olimex-arm-usb-ocd-h.cfg -f board/esp-wroom-32.cfg -c 'program_esp32 build/partitions_singleapp.bin 0x8000 verify' -c 'program_esp32 build/bootloader/bootloader.bin 0x1000 verify' -c 'program_esp32 build/ai-deck-jpeg-streamer-demo.bin 0x10000 verify reset exit'"
+
+# if you only want to flash use this instead
+$ docker run --rm -it -v $PWD:/module/ --device /dev/ttyUSB0 --privileged -P bitcraze/aideck-nina:3.3.1 /bin/bash -c "/openocd-esp32/bin/openocd -f interface/ftdi/olimex-arm-usb-ocd-h.cfg -f board/esp-wroom-32.cfg -c 'program_esp32 build/partitions_singleapp.bin 0x8000 verify' -c 'program_esp32 build/bootloader/bootloader.bin 0x1000 verify' -c 'program_esp32 build/ai-deck-jpeg-streamer-demo.bin 0x10000 verify reset exit'"
+```
+
+note: if you dont want to specify tag, this is the original command
+```
 # Run now the docker command
 > Working directory: AIdeck_examples/NINA/firmware
 $ docker run --rm -it -v $PWD:/module/ --device /dev/ttyUSB0 --privileged -P bitcraze/aideck-nina /bin/bash -c "make clean; make menuconfig; make all; /openocd-esp32/bin/openocd -f interface/ftdi/olimex-arm-usb-ocd-h.cfg -f board/esp-wroom-32.cfg -c 'program_esp32 build/partitions_singleapp.bin 0x8000 verify' -c 'program_esp32 build/bootloader/bootloader.bin 0x1000 verify' -c 'program_esp32 build/ai-deck-jpeg-streamer-demo.bin 0x10000 verify reset exit'"
+```
 
-# specifying docker version/tag !
-$ docker run --rm -it -v $PWD:/module/ --device /dev/ttyUSB0 --privileged -P bitcraze/aideck-nina:3.3.1 /bin/bash -c "make clean; make menuconfig; make all; /openocd-esp32/bin/openocd -f interface/ftdi/olimex-arm-usb-ocd-h.cfg -f board/esp-wroom-32.cfg -c 'program_esp32 build/partitions_singleapp.bin 0x8000 verify' -c 'program_esp32 build/bootloader/bootloader.bin 0x1000 verify' -c 'program_esp32 build/ai-deck-jpeg-streamer-demo.bin 0x10000 verify reset exit'"
-#only flash
-$ docker run --rm -it -v $PWD:/module/ --device /dev/ttyUSB0 --privileged -P bitcraze/aideck-nina:3.3.1 /bin/bash -c "/openocd-esp32/bin/openocd -f interface/ftdi/olimex-arm-usb-ocd-h.cfg -f board/esp-wroom-32.cfg -c 'program_esp32 build/partitions_singleapp.bin 0x8000 verify' -c 'program_esp32 build/bootloader/bootloader.bin 0x1000 verify' -c 'program_esp32 build/ai-deck-jpeg-streamer-demo.bin 0x10000 verify reset exit'"
+## configure it as access point
 
-
+```
 # MENUCONFIG
 in makeconfig you can set wither the drone in access point mode or passing through router.
 
@@ -43,3 +54,4 @@ nmap -sn 192.168.0.0/24
 # Run viewer
 now run python script with
 	python viewer_custom.py -n 192.168.0.244
+```
